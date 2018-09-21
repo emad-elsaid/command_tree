@@ -1,8 +1,6 @@
 # CommandTree
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/command_tree`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Builds trees of commands for the terminal, each node is either a group of commands or the command itself, every node is associated with a character to access it.
 
 ## Installation
 
@@ -22,7 +20,34 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+You start by creating a new tree
+
+```ruby
+t = CommandTree::Tree.new
+```
+
+Then you can register a command category (a node that contains commands)
+
+```ruby
+t.register 'a', 'Applications' # associate the character 'a' to a category called 'applications'
+```
+
+Then register commands inside that prefix
+```ruby
+t.register 'ag','Google Chrome' do
+  system 'google-chrome-stable'
+end
+```
+the previous block will be assigned to 'g' inside 'a' which is the application's prefix, so you can execute it with 'ag' when you run that tree in terminal.
+
+To run the tree call `#show`
+```ruby
+t.show
+```
+
+it will print the toplevel categories and commands and wait for you to press a character to execute the command or print sub commands of a category node.
+
+when the tree reachs a leaf it'll exit, if a command is the leaf it will execute it and exit the tree giving your code the control again.
 
 ## Development
 
@@ -32,7 +57,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/blazeeboy/command_tree.
+Bug reports and pull requests are welcome on GitHub at https://github.com/emad-elsaid/command_tree.
 
 ## License
 
