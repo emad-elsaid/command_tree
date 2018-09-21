@@ -1,6 +1,8 @@
-# CommandTree
+# CommandTree [![Gem Version](https://badge.fury.io/rb/command_tree.svg)](https://badge.fury.io/rb/command_tree)
 
 Builds trees of commands for the terminal, each node is either a group of commands or the command itself, every node is associated with a character to access it.
+
+[![asciicast](https://asciinema.org/a/202202.png)](https://asciinema.org/a/202202)
 
 ## Installation
 
