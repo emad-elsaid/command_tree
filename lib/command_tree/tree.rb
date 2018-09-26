@@ -72,9 +72,11 @@ module CommandTree
     end
 
     def table(items, item_width)
-      _, width = IO.console.winsize
-      items_per_row = width / item_width
-      puts items.shift(items_per_row).join until items.empty?
+      _, screen_width = IO.console.winsize
+      items_per_row = screen_width / item_width
+      items_dup = items.dup
+
+      puts items_dup.shift(items_per_row).join until items_dup.empty?
     end
   end
 end
