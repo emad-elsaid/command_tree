@@ -68,16 +68,13 @@ module CommandTree
       end
 
       table(table_content, 40)
-      print "\n\n"
+      print "\n"
     end
 
     def table(items, item_width)
       _, width = IO.console.winsize
       items_per_row = width / item_width
-      items.each_with_index do |item, index|
-        print item
-        print "\n" if ((index + 1) % items_per_row).zero? && index > 0
-      end
+      puts items.shift(items_per_row).join until items.empty?
     end
   end
 end
