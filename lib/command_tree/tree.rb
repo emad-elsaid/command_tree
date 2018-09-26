@@ -8,9 +8,9 @@ module CommandTree
       @calls = { '' => {} }
     end
 
-    def register(path, name, &block)
-      insure_path(path, name)
-      calls[path] = { name: name, block: block } if block_given?
+    def register(path, name, options = {}, &block)
+      insure_path(path, name, options)
+      calls[path] = { name: name, options: options, block: block } if block_given?
     end
 
     def show
@@ -21,11 +21,11 @@ module CommandTree
 
     attr_accessor :calls
 
-    def insure_path(path, name)
+    def insure_path(path, name, options = {})
       return if path.empty?
 
-      insure_path(path[0...-1], name)
-      calls[path] = { name: name } unless calls[path]
+      insure_path(path[0...-1], name, options)
+      calls[path] = { name: name, options: options } unless calls[path]
     end
 
     def execute_path(path)
@@ -33,15 +33,18 @@ module CommandTree
 
       node = calls[path]
       children = calls.keys.select { |key| key.start_with?(path) && key.length == (path.length + 1) }
+      children.sort!
+
+      puts "#{node[:name]}:".light_magenta.bold if node.key?(:name)
+
+      description = node.dig(:options, :desc)
+      puts description.to_s.light_black if description
 
       node[:block].call if node.key?(:block)
 
       return if children.empty?
 
-      puts "#{node[:name]}:".light_magenta.bold if node.key?(:name)
-
       print_children(children)
-
       choice = STDIN.getch
       execute_path(path + choice)
     end
