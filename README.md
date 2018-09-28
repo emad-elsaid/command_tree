@@ -29,7 +29,7 @@ You start by creating a new tree
 t = CommandTree::Tree.new
 ```
 
-Then you can register a command category (a node that contains commands)
+Then you register a command category (a node that contains a group of commands)
 
 ```ruby
 t.register 'a', 'Applications' # associate the character 'a' to a category called 'applications'
@@ -51,6 +51,19 @@ t.show
 it will print the toplevel categories and commands and wait for you to press a character to execute the command or print sub commands of a category node.
 
 when the tree reachs a leaf it'll exit, if a command is the leaf it will execute it and exit the tree giving your code the control again.
+
+
+There is another way to define a group of commands in a nested way using `Tree#group` method as follows
+
+```ruby
+t = CommandTree::Tree.new
+t.group 'a', 'Applications' do |g|
+  g.register 'g','Google Chrome' do
+    system 'google-chrome-stable'
+  end
+end
+t.show
+```
 
 ## Development
 
