@@ -19,7 +19,7 @@ module CommandTree
       until names.empty?
         puts names.shift(items_per_row).join
         row_descs = descs.shift(items_per_row).join
-        puts row_descs unless row_descs.empty?
+        puts row_descs unless row_descs.strip.empty?
       end
     end
 
@@ -46,7 +46,7 @@ module CommandTree
 
     def item_desc(item)
       desc = item.desc.to_s
-      return desc if desc.strip.empty?
+      return desc.ljust(item_width) if desc.strip.empty?
 
       return (desc[0...item_width - 3] + '...').light_black if desc.length >= item_width
       return desc.ljust(item_width).light_black
