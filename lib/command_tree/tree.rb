@@ -1,12 +1,14 @@
 require 'io/console'
-require 'colorize'
-require 'colorized_string'
+
+require_relative 'group'
+require_relative 'command'
+require_relative 'text_menu'
 
 module CommandTree
   # A tree of commands and associated keys for every node
   class Tree
     def initialize
-      @calls = { '' => {} }
+      @calls = { '' => nil }
     end
 
     # register a `path` to a `name` with a block of code if
@@ -14,10 +16,14 @@ module CommandTree
     # supported:
     # desc: a description of the item, as a help text for the user
     def register(path, name, options = {}, &block)
+      path = path.to_s
+      name = name.to_s
+      prefix = path[-1]
+
       insure_path(path, name, options)
       return unless block_given?
 
-      calls[path] = { name: name, options: options, block: block }
+      calls[path] = Command.new(prefix, name, options, &block)
     end
 
     # define a group of commands (subtree)
@@ -41,7 +47,7 @@ module CommandTree
     def merge(subtree, prefix, name, options = {})
       register(prefix, name, options)
       subtree.calls.each do |key, command|
-        next if key.empty?
+        next unless command
 
         calls["#{prefix}#{key}"] = command
       end
@@ -57,25 +63,16 @@ module CommandTree
       return if path.empty?
 
       insure_path(path[0...-1], name, options)
-      calls[path] = { name: name, options: options } unless calls[path]
+      calls[path] = Group.new(path[-1], name, options) unless calls[path]
     end
 
     def execute_path(path)
       return puts "#{path} couldn't be found..." unless calls.key?(path)
 
       node = calls[path]
-      children = calls.keys.select do |key|
-        key.start_with?(path) && key.length == (path.length + 1)
-      end
-      children.sort!
+      node.execute if node
 
-      puts "#{node[:name]}:".light_magenta.bold if node.key?(:name)
-
-      description = node.dig(:options, :desc)
-      puts description.to_s.light_black if description
-
-      node[:block].call if node.key?(:block)
-
+      children = get_children(path)
       return if children.empty?
 
       print_children(children)
@@ -83,34 +80,21 @@ module CommandTree
       execute_path(path + choice)
     end
 
-    def print_children(children)
-      table_content = []
-
-      children.each do |child|
-        child_node = calls[child]
-
-        output = child[-1].green
-        output << ' → '.light_black
-
-        output << if child_node.key?(:block)
-                    " #{child_node[:name].ljust(40)}".cyan
-                  else
-                    "+#{child_node[:name].ljust(40)}".light_magenta.bold
-                  end
-
-        table_content << output
-      end
-
-      table(table_content, 40)
-      print "\n"
+    def get_children(path)
+      calls.keys.select do |key|
+        key.start_with?(path) && key.length == (path.length + 1)
+      end.sort
     end
 
-    def table(items, item_width)
-      _, screen_width = IO.console.winsize
-      items_per_row = screen_width / item_width
-      items_dup = items.dup
+    def print_children(children)
+      menu = TextMenu.new(40)
 
-      puts items_dup.shift(items_per_row).join until items_dup.empty?
+      children.each do |child|
+        menu.add calls[child]
+      end
+
+      menu.render
+      print "\n"
     end
   end
 end
