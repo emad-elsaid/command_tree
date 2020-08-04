@@ -1,24 +1,23 @@
 PATH
   remote: .
   specs:
-    command_tree (0.1.5)
-      colorize (~> 0.8)
+    command_tree (0.2.0)
+      colorize
 
 GEM
   remote: https://rubygems.org/
   specs:
     colorize (0.8.1)
-    minitest (5.11.3)
-    rake (10.5.0)
+    minitest (5.14.1)
+    rake (13.0.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.16)
   command_tree!
-  minitest (~> 5.0)
-  rake (~> 10.0)
+  minitest
+  rake
 
 BUNDLED WITH
-   1.16.1
+   2.1.4
